@@ -923,6 +923,7 @@ module Discordrb
     end
 
     # Internal handler for GUILD_DELETE
+    # @return [Server]
     def delete_guild(data)
       id = data['id'].to_i
       @servers.delete(id)
@@ -1283,14 +1284,9 @@ module Discordrb
         event = ServerUpdateEvent.new(data, self)
         raise_event(event)
       when :GUILD_DELETE
-        delete_guild(data)
+        server = delete_guild(data)
 
-        if data['unavailable'].is_a? TrueClass
-          LOGGER.warn("Server #{data['id']} is unavailable due to an outage!")
-          return # Don't raise an event
-        end
-
-        event = ServerDeleteEvent.new(data, self)
+        event = ServerDeleteEvent.new(server || data, self)
         raise_event(event)
       when :GUILD_EMOJIS_UPDATE
         server_id = data['guild_id'].to_i
