@@ -67,8 +67,9 @@ module Discordrb
     # @!visibility private
     def initialize(data, bot, exists = true)
       @bot = bot
-      @owner_id = data['owner_id'].to_i
       @id = data['id'].to_i
+      return unless exists
+      @owner_id = data['owner_id'].to_i
 
       process_channels(data['channels'])
       update_data(data)
@@ -92,8 +93,7 @@ module Discordrb
       @chunked = false
       @processed_chunk_members = 0
 
-      # Only get the owner of the server actually exists (i.e. not for ServerDeleteEvent)
-      @owner = member(@owner_id) if exists
+      @owner = member(@owner_id)
 
       @booster_count = data['premium_subscription_count'] || 0
       @boost_level = data['premium_tier']

@@ -60,12 +60,15 @@ module Discordrb::Events
   # bot made itself leave the server.
   # @see Discordrb::EventContainer#server_delete
   class ServerDeleteEvent < ServerEvent
-    # @return [Integer] The ID of the server that was left.
+    # @note this is a copy of Server instance retreived from cache. The only
+    #   method which is guarantee to return correct value is {Server#id}.
+    # @return [Server]
     attr_reader :server
 
     # Override init_server to account for the deleted server
+    # @param data [Server, Hash]
     def init_server(data, _bot)
-      @server = data['id'].to_i
+      @server = data.is_a?(Discordrb::Server) ? data : Discordrb::Server.new(data, bot, false)
     end
   end
 
