@@ -257,9 +257,9 @@ module Discordrb
 
     # Stops the bot gracefully, disconnecting the websocket without immediately killing the thread. This means that
     # Discord is immediately aware of the closed connection and makes the bot appear offline instantly.
-    # @note This method no longer takes an argument as of 3.4.0
-    def stop(_no_sync = nil)
-      @gateway.stop
+    # @param no_sync [true, false] Whether or not to disable use of synchronize in the close method. This should be true if called from a trap context.
+    def stop(no_sync = false)
+      @gateway.stop(no_sync)
     end
 
     # @return [true, false] whether or not the bot is currently connected to Discord.
@@ -782,12 +782,10 @@ module Discordrb
 
       server.update_voice_state(data)
 
-      existing_voice = @voices[server_id]
-      if user_id == @profile.id && existing_voice
-        new_channel_id = data['channel_id']
-        if new_channel_id
-          new_channel = channel(new_channel_id)
-          existing_voice.channel = new_channel
+      if user_id == @profile.id && @voices[server_id]
+        # If channel_id is nil, we've been disconnected from voice.
+        if data['channel_id']
+          @voices[server_id].channel = channel(data['channel_id'])
         else
           voice_destroy(server_id)
         end
