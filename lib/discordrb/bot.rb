@@ -318,8 +318,10 @@ module Discordrb
     # @param chan [Channel, String, Integer] The voice channel, or its ID, to connect to.
     # @param encrypted [true, false] Whether voice communication should be encrypted using
     #   (uses an XSalsa20 stream cipher for encryption and Poly1305 for authentication)
+    # @param self_mute [true, false] Whether bot should be muted to everyone else.
+    # @param self_deaf [true, false] Whether bot should be deaf towards other users.
     # @return [Voice::VoiceBot] the initialized bot over which audio data can then be sent.
-    def voice_connect(chan, encrypted = true)
+    def voice_connect(chan, encrypted = true, self_mute: false, self_deaf: false)
       raise ArgumentError, 'Unencrypted voice connections are no longer supported.' unless encrypted
 
       chan = channel(chan.resolve_id)
@@ -334,7 +336,7 @@ module Discordrb
       debug("Got voice channel: #{chan}")
 
       @should_connect_to_voice[server_id] = chan
-      @gateway.send_voice_state_update(server_id.to_s, chan.id.to_s, false, false)
+      @gateway.send_voice_state_update(server_id.to_s, chan.id.to_s, self_mute, self_deaf)
 
       debug('Voice channel init packet sent! Now waiting.')
 
