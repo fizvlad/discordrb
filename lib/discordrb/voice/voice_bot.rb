@@ -301,7 +301,7 @@ module Discordrb::Voice
     # Plays the data from the @io stream as Discord requires it
     def play_internal
       count = 0
-      count_laggy = 0
+      count_overdue = 0
       @playing = true
 
       # Default play length (ms), will be adjusted later
@@ -375,11 +375,11 @@ module Discordrb::Voice
           # Wait `length` ms, then send the next packet
           sleep @length / 1000.0
         else
-          count_laggy += 1
+          count_overdue += 1
         end
       end
 
-      Discordrb::LOGGER.warn("Audio encoding and sending was overdued for #{100.0 * count_laggy / count}% of packets! This may be indicative of network problems.") unless count_laggy == 0
+      Discordrb::LOGGER.warn("Audio encoding and sending was overdued for #{100.0 * count_overdue / count}% of packets! This may be indicative of network problems.") unless count_overdue.zero?
 
       @bot.debug('Sending five silent frames to clear out buffers')
 
