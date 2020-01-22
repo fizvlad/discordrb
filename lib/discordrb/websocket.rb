@@ -49,7 +49,7 @@ module Discordrb
           end
         end
         ws.on(:close) { |err| instance.close_handler.call(err) }
-        ws.on(:error) { |err| instance.error_handler.call(err) }
+        ws.on(:error) { |err| instance.error_handler.call(err); close }
       end
     end
 
