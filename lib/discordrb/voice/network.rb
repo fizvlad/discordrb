@@ -344,7 +344,12 @@ module Discordrb::Voice
         host,
         method(:websocket_open),
         method(:websocket_message),
-        proc { |e| Discordrb::LOGGER.warn "VWS close: #{e}" },
+        proc do |e|
+          Discordrb::LOGGER.info "VWS close: #{e}" unless e.to_s.empty?
+          @client.close
+          # NOTE: closing client inside it's closing handler isn't the best idea but otherwise you get threads leak.
+          # "Wscs is an enigma. A gross enigma" (c) Swarley
+        end,
         proc { |e| Discordrb::LOGGER.error "VWS error: #{e}" }
       )
 
