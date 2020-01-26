@@ -344,8 +344,8 @@ module Discordrb::Voice
         host,
         method(:websocket_open),
         method(:websocket_message),
-        proc { |e| Discordrb::LOGGER.error "VWS error: #{e}" },
-        proc { |e| Discordrb::LOGGER.warn "VWS close: #{e}" }
+        proc { |e| Discordrb::LOGGER.warn "VWS close: #{e}" },
+        proc { |e| Discordrb::LOGGER.error "VWS error: #{e}" }
       )
 
       @bot.debug('VWS connected')
