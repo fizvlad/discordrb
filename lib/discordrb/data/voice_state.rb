@@ -20,10 +20,13 @@ module Discordrb
     attr_reader :self_deaf
 
     # @return [Channel] the voice channel this voice state's member is in.
-    attr_reader :voice_channel
+    def voice_channel
+      @bot.channel(@voice_channel_id)
+    end
 
     # @!visibility private
-    def initialize(user_id)
+    def initialize(bot, user_id)
+      @bot = bot
       @user_id = user_id
     end
 
@@ -31,7 +34,7 @@ module Discordrb
     # @note For internal use only.
     # @!visibility private
     def update(channel, mute, deaf, self_mute, self_deaf)
-      @voice_channel = channel
+      @voice_channel_id = channel.id
       @mute = mute
       @deaf = deaf
       @self_mute = self_mute
