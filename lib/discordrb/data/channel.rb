@@ -20,7 +20,9 @@ module Discordrb
     attr_reader :name
 
     # @return [Server, nil] the server this channel is on. If this channel is a PM channel, it will be nil.
-    attr_reader :server
+    def server
+      @bot.server(@server_id)
+    end
 
     # @return [Integer, nil] the ID of the parent channel, if this channel is inside a cateogry
     attr_reader :parent_id
@@ -99,7 +101,7 @@ module Discordrb
         end
       else
         @name = data['name']
-        @server = server || bot.server(data['guild_id'].to_i)
+        @server_id = server.id || data['guild_id'].to_i
       end
 
       @nsfw = data['nsfw'] || false
@@ -199,7 +201,7 @@ module Discordrb
       ids = if parent
               parent.children
             else
-              @server.channels.reject(&:parent_id).select { |c| c.type == @type }
+              server.channels.reject(&:parent_id).select { |c| c.type == @type }
             end.sort_by(&:position).map(&:id)
 
       # Move our channel ID after the target ID by deleting it,
@@ -225,7 +227,7 @@ module Discordrb
         move_argument << hash
       end
 
-      API::Server.update_channel_positions(@bot.token, @server.id, move_argument)
+      API::Server.update_channel_positions(@bot.token, server.id, move_argument)
     end
 
     # Sets whether this channel is NSFW
@@ -509,9 +511,9 @@ module Discordrb
     # @return [Array<Member>] the users in this channel
     def users
       if text?
-        @server.online_members(include_idle: true).select { |u| u.can_read_messages? self }
+        server.online_members(include_idle: true).select { |u| u.can_read_messages? self }
       elsif voice?
-        @server.voice_states.map { |id, voice_state| @server.member(id) if !voice_state.voice_channel.nil? && voice_state.voice_channel.id == @id }.compact
+        server.voice_states.map { |id, voice_state| server.member(id) if !voice_state.voice_channel.nil? && voice_state.voice_channel.id == @id }.compact
       end
     end
 
@@ -733,7 +735,7 @@ module Discordrb
 
     # The default `inspect` method is overwritten to give more useful output.
     def inspect
-      "<Channel name=#{@name} id=#{@id} topic=\"#{@topic}\" type=#{@type} position=#{@position} server=#{@server}>"
+      "<Channel name=#{@name} id=#{@id} topic=\"#{@topic}\" type=#{@type} position=#{@position} server=#{server}>"
     end
 
     # Adds a recipient to a group channel.
