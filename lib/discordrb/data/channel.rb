@@ -101,7 +101,7 @@ module Discordrb
         end
       else
         @name = data['name']
-        @server_id = server.id || data['guild_id'].to_i
+        @server_id = server&.id || data['guild_id'].to_i
       end
 
       @nsfw = data['nsfw'] || false
