@@ -21,7 +21,11 @@ module Discordrb
 
     # @return [Server, nil] the server this channel is on. If this channel is a PM channel, it will be nil.
     def server
-      @bot.server(@server_id)
+      if @server_id.nil?
+        nil
+      else
+        @bot.server(@server_id)
+      end
     end
 
     # @return [Integer, nil] the ID of the parent channel, if this channel is inside a cateogry
