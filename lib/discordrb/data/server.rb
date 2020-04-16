@@ -462,11 +462,11 @@ module Discordrb
       if data['channel_id']
         unless @voice_states[user_id]
           # Create a new voice state for the user
-          @voice_states[user_id] = VoiceState.new(user_id)
+          @voice_states[user_id] = VoiceState.new(@bot, user_id)
         end
 
         # Update the existing voice state (or the one we just created)
-        channel = @channels_by_id[data['channel_id'].to_i]
+        channel = @bot.channel(data['channel_id'].to_i)
         @voice_states[user_id].update(
           channel,
           data['mute'],

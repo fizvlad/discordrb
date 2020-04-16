@@ -22,11 +22,15 @@ module Discordrb::Voice
   # {VoiceBot#adjust_offset}, and {VoiceBot#adjust_average}.
   class VoiceBot
     # @return [Channel] the current voice channel
-    attr_reader :channel
+    def channel
+      @bot.channel(@channel_id)
+    end
 
     # @!visibility private
     # For internal use only
-    attr_writer :channel
+    def channel=(c)
+      @channel_id = c.resolve_id
+    end
 
     # @return [Integer, nil] the amount of time the stream has been playing, or `nil` if nothing has been played yet.
     attr_reader :stream_time
@@ -80,7 +84,8 @@ module Discordrb::Voice
     # @!visibility private
     def initialize(channel, bot, token, session, endpoint)
       @bot = bot
-      @channel = channel
+      @channel_id = channel.id
+      @server_id = channel.server.id
 
       @ws = VoiceWS.new(channel, bot, token, session, endpoint)
       @udp = @ws.udp
@@ -175,7 +180,7 @@ module Discordrb::Voice
     # Permanently disconnects from the voice channel; to reconnect you will have to call {Bot#voice_connect} again.
     def destroy
       stop_playing
-      @bot.voice_destroy(@channel.server.id, false)
+      @bot.voice_destroy(@server_id, false)
       @ws.destroy
     end
 
