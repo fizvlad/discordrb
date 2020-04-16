@@ -189,8 +189,8 @@ module Discordrb::Voice
     # play stuff, as these are fully threaded, but if you don't want this behaviour anyway, be sure to call these
     # methods in separate threads.
     # @param encoded_io [IO] A stream of raw PCM data (s16le)
-    def play(encoded_io)
-      stop_playing(true) if @playing
+    def play(encoded_io, wait_for_confirmation = false)
+      stop_playing(wait_for_confirmation) if @playing
       @retry_attempts = 3
       @first_packet = true
 
@@ -262,8 +262,8 @@ module Discordrb::Voice
     #   re-encoding it, which defeats its entire purpose (no recoding).
     # @see https://github.com/bwmarrin/dca
     # @see #play
-    def play_dca(file)
-      stop_playing(true) if @playing
+    def play_dca(file, wait_for_confirmation = false)
+      stop_playing(wait_for_confirmation) if @playing
 
       @bot.debug "Reading DCA file #{file}"
       input_stream = File.open(file)
