@@ -784,10 +784,10 @@ module Discordrb
     end
 
     # Close codes that are unrecoverable, after which we should not try to reconnect.
-    # - 4003: Not authenticated. How did this happen?
+    # - 4003: Not authenticated. How did this happen? NOTE: Removed until dealt with random logoffs.
     # - 4004: Authentication failed. Token was wrong, nothing we can do.
     # - 4011: Sharding required. Currently requires developer intervention.
-    FATAL_CLOSE_CODES = [4003, 4004, 4011].freeze
+    FATAL_CLOSE_CODES = [4004, 4011].freeze
 
     def handle_close(e)
       @bot.__send__(:raise_event, Events::DisconnectEvent.new(@bot))
