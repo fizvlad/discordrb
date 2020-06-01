@@ -372,7 +372,7 @@ module Discordrb
       @instant_reconnect = true
       @should_reconnect = true
 
-      close
+      close(code: 4000)
     end
 
     # Sends a resume packet (op 6). This replays all events from a previous point specified by its packet sequence. This
@@ -807,7 +807,7 @@ module Discordrb
       end
     end
 
-    def send(data, type = :text)
+    def send(data, type = :text, code = nil)
       LOGGER.out(data)
 
       unless @handshaked && !@closed
@@ -816,7 +816,7 @@ module Discordrb
       end
 
       # Create the frame we're going to send
-      frame = ::WebSocket::Frame::Outgoing::Client.new(data: data, type: type, version: @handshake.version)
+      frame = ::WebSocket::Frame::Outgoing::Client.new(data: data, type: type, code: code, version: @handshake.version)
 
       # Try to send it
       begin
@@ -828,7 +828,7 @@ module Discordrb
       end
     end
 
-    def close(e = nil)
+    def close(e = nil, code: 1000)
       # If we're already closed, there's no need to do anything - return
       return if @closed
 
@@ -836,7 +836,7 @@ module Discordrb
       @session&.suspend
 
       # Send a close frame (if we can)
-      send nil, :close unless @pipe_broken
+      send nil, :close, code unless @pipe_broken
 
       # We're officially closed, notify the main loop.
       @closed = true
