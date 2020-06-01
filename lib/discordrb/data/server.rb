@@ -26,9 +26,6 @@ module Discordrb
     # @return [String] the ID of the region the server is on (e.g. `amsterdam`).
     attr_reader :region_id
 
-    # @return [Member] The server owner.
-    attr_reader :owner
-
     # @return [Array<Channel>] an array of all the channels (text and voice) on this server.
     attr_reader :channels
 
@@ -93,10 +90,13 @@ module Discordrb
       @chunked = false
       @processed_chunk_members = 0
 
-      @owner = member(@owner_id)
-
       @booster_count = data['premium_subscription_count'] || 0
       @boost_level = data['premium_tier']
+    end
+
+    # @return [Member] The server owner.
+    def owner
+      @owner ||= member(@owner_id)
     end
 
     # The default channel is the text channel on this server with the highest position
@@ -389,6 +389,13 @@ module Discordrb
 
       API.banner_url(@id, @banner_id)
     end
+
+    # @return [String] a URL that a user can use to navigate to this server in the client
+    def link
+      "https://discordapp.com/channels/#{@id}"
+    end
+
+    alias_method :jump_link, :link
 
     # Adds a role to the role cache
     # @note For internal use only
